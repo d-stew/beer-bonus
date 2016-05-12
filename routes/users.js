@@ -4,7 +4,39 @@ const knex = require('../db')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
 
-/* GET users listing. */
+
+router.get('/me', function (req, res, next) {
+  // get authorization header
+  // "Bearer 2349d8092390sd9029304" OR nothing
+  // string logic to parse that
+  // decode it
+  // find the user that matches that ID
+  // return the user object (maybe just the name)
+
+  if (req.headers.authorization) {
+    const token = req.headers.authorization.split(' ')[1];
+    // IF it was expired, verify would throw an exception
+    // We would have to catch in a try/catch
+
+    const payload = jwt.verify(token, process.env.JWT_SECRET)
+    // Payload is {id: 56}
+
+    knex('users').where({id: payload.id}).first().then(function (user) {
+      if (user) {
+        res.json({id: user.id, name: user.name})
+      } else {
+        res.status(403).json({
+          error: "Invalid ID"
+        })
+      }
+    })
+  } else {
+    res.status(403).json({
+      error: "No token"
+    })
+  }
+})
+
 router.post('/signup', function(req, res, next) {
   const errors = [];
 
