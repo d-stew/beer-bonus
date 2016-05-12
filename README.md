@@ -8,5 +8,5 @@ npm install
 cp .env.example .env
 
 knex migrate:latest
-
+knex seed:run
 ```
